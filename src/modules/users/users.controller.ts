@@ -18,25 +18,28 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('avatar'))
   async uploadFile(@Body() body: any, @UploadedFile() file: Express.Multer.File, @Res() res: Response) {
     try {
-      const fileName = await uploadFileToStorage(file,"user-avatar",file.buffer)
+      const fileName = await uploadFileToStorage(file, "user-avatar", file.buffer)
       const userId = JSON.parse(body.id)
       let updateData = {
         id: userId,
         avatar: fileName
       }
-      let { message,data, error } = await this.usersService.uploadAvatar(updateData)
+      let { message, data, error } = await this.usersService.uploadAvatar(updateData)
       if (error) {
         throw error
-      }else{
+      } else {
         return res.status(200).json({
           message,
           data,
-          token:this.tokenServ.createToken(data,"1d")
+          token: this.tokenServ.createToken(data, "1d")
         })
       }
     } catch (error) {
-      // console.log('Chỉnh sửa Avatar thất bại');
+      //---
+      console.log("error",error);
+      console.log('Chỉnh sửa Avatar thất bại');
       
+
       return res.status(413).json({
         message: "Chỉnh sửa Avatar thất bại",
         error
@@ -50,10 +53,14 @@ export class UsersController {
   async createNewUser(@UploadedFile() file: Express.Multer.File, @Body() body: any, @Res() res: Response) {
     try {
       let newUserDetail = JSON.parse(body.data)
-      const fileName = await uploadFileToStorage(file,"user-avatar",file.buffer)
+
+      //---
+      // console.log("newUserDetail",newUserDetail);
       
+      const fileName = await uploadFileToStorage(file, "user-avatar", file.buffer)
+
       //let realIp = req.headers['x-forwarded-for'].toString().split(",")[0]
-      let { message, error, data } = await this.usersService.createNewUser({ ...newUserDetail, ip: "127.0.0.1" , avatar:fileName});
+      let { message, error, data } = await this.usersService.createNewUser({ ...newUserDetail, ip: "127.0.0.1", avatar: fileName });
 
       this.mailerSevice.sendMail(newUserDetail.email, "Xác nhận Email", emailTemplates.emailVerify(newUserDetail.email, `http://${process.env.HOST_API}/api/v1/users/email-confirm/${this.tokenServ.createToken(data, "3d")}`))
       if (!error) {
@@ -61,22 +68,29 @@ export class UsersController {
       }
       throw error
     } catch (error) {
+
       if (error.code == "P2002") {
         if (error.meta.target == "users_email_key") {
+
+
           return res.status(213).json({
             message: "Email đã tồn tại!",
           })
         }
         if (error.meta.target == "users_phone_key") {
           return res.status(213).json({
-            message: "Số điện thoại đã được đăng ký, xin vui lòng sử dụng số khác!",
+            message: "SDT đã được đăng ký, xin vui lòng sử dụng số khác!",
           })
         }
       }
-      
+
+      //---
+      console.log("error", error);
+
       return res.status(413).json({
-        message: "Lỗi gì đó r",
+        message: "Lỗi gì đó roi",
         error
+
       })
     }
   }
@@ -109,14 +123,25 @@ export class UsersController {
             data
           })
         }
+
+        //---
+        // console.log("data", data);
+
       } else {
+
+        //---
+        // console.log("data", data);
+
         return res.status(200).json({
           message,
           data
         })
       }
     } catch (error) {
-      console.log(error);
+
+      //---
+      console.log("error", error);
+
       return res.status(413).json({
         message: "Lỗi gì đó!",
         error
@@ -126,43 +151,43 @@ export class UsersController {
 
   //login
   @Post("login")
-  async loginFn(@Body() loginInfo:loginUserDto, @Res() res:Response){
+  async loginFn(@Body() loginInfo: loginUserDto, @Res() res: Response) {
     try {
-      let{message, info} = await this.usersService.loginFn(loginInfo)
+      let { message, info } = await this.usersService.loginFn(loginInfo)
       if (info) {
         return res.status(200).json({
           message,
           info,
-          token:this.tokenServ.createToken(info,"1d")
+          token: this.tokenServ.createToken(info, "1d")
         })
-      }else{
+      } else {
         return res.status(213).json({
           message
         })
       }
     } catch (error) {
-        return res.status(413).json({
-          message:"Lỗi j nhỉ?",
-          error
-        })
+      return res.status(413).json({
+        message: "Lỗi j nhỉ?",
+        error
+      })
     }
   }
 
   //checkLogin
   @Post("check-login")
-  async checkLoginFn(@Body() body:{token:string}, @Res() res:Response){
+  async checkLoginFn(@Body() body: { token: string }, @Res() res: Response) {
     try {
       let loginUser = await this.tokenServ.verify(body.token)
       if (!loginUser) {
         res.status(413)
       }
-      let {data} = await this.usersService.checkLoginFn(loginUser)
-      
+      let { data } = await this.usersService.checkLoginFn(loginUser)
+
       if (data) {
         return res.status(200).json({
           data
         })
-      }else{
+      } else {
         return res.status(214)
       }
     } catch (error) {
@@ -171,18 +196,18 @@ export class UsersController {
   }
 
   @Post('login-google')
-  async loginWithGoogle(@Body() body:createUserDto, @Res() res:Response){
+  async loginWithGoogle(@Body() body: createUserDto, @Res() res: Response) {
     try {
-      const {message,info, error} = await this.usersService.loginWithGoogle(body)
+      const { message, info, error } = await this.usersService.loginWithGoogle(body)
       if (error) {
         throw error
       }
       if (info) {
         return res.status(200).json({
           message,
-          token:this.tokenServ.createToken(info,"1d")
+          token: this.tokenServ.createToken(info, "1d")
         })
-      }else{
+      } else {
         return res.status(214).json({
           message
         })
@@ -195,26 +220,35 @@ export class UsersController {
   }
 
   @Patch('update-password')
-  async updatePassword(@Body() body:{userId:number,old:string,new:string}, @Res() res:Response){
+  async updatePassword(@Body() body: { userId: number, old: string, new: string }, @Res() res: Response) {
     try {
-      const {message , result , data , error} = await this.usersService.updatePassword(body)
+      const { message, result, data, error } = await this.usersService.updatePassword(body)
       if (result) {
 
-                        //---
-                        console.log("body",body);
-                        console.log("result",result);
+        //---
+        // console.log("body1", body);
+        // console.log("result1", result);
 
 
         return res.status(200).json({
           message,
           data
         })
-      }else{
+      } else {
+
+        //---
+        // console.log("body2", body);
+        // console.log("result2", result);
+
         return res.status(214).json({
           message
         })
       }
     } catch (error) {
+
+      //---
+      console.log("error", error);
+
       return res.status(413).json({
         error
       })
@@ -223,15 +257,25 @@ export class UsersController {
 
   //----
   @Patch('update-phone-user')
-  async updatePhoneUser(@Body() body:{userId:number,old:string,new:string}, @Res() res:Response){
+  async updatePhoneUser(@Body() body: { userId: number, old: string, new: string }, @Res() res: Response) {
     try {
-      const {message , result , data , error} = await this.usersService.updatePhoneUser(body)
+      const { message, result, data, error } = await this.usersService.updatePhoneUser(body)
       if (result) {
+
+        //---
+        console.log("body1", body);
+        console.log("result1", result);
+
         return res.status(200).json({
           message,
           data
         })
-      }else{
+      } else {
+
+        //---
+        console.log("body2", body);
+        console.log("result2", result);
+
         return res.status(214).json({
           message
         })
@@ -244,8 +288,8 @@ export class UsersController {
   }
 
   @Post('top-up')
-  async topUp(@Body() body:any){
-    console.log("body",body);
-    
+  async topUp(@Body() body: any) {
+    console.log("body", body);
+
   }
 }

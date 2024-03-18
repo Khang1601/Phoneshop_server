@@ -75,7 +75,7 @@ export class AdminsUsersService {
       if (checkExist) {
         return {
           result: false,
-          message: 'Số điện thoại đã tồn tại!'
+          message: 'SDT đã tồn tại!'
         }
       } else {
         const result = await this.prisma.users.update({
@@ -89,7 +89,7 @@ export class AdminsUsersService {
         })
         return {
           result: true,
-          message: 'Cập nhật số điện thoại thành công'
+          message: 'Cập nhật SDT thành công'
         }
       }
     } catch (error) {
