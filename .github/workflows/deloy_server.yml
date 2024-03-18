@@ -18,9 +18,9 @@ jobs:
     - name: Kết nối ssh linux -> và pull
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.LINUX_UBUNTU_SERVER_IP }}
-        username: ${{ secrets.LINUX_UBUNTU_SERVER_USERNAME }}
-        password: ${{ secrets.LINUX_UBUNTU_SERVER_PASSWORD }}
+        host: ${{ secrets.LINUX_HOST }}
+        username: ${{ secrets.LINUX_USERNAME }}
+        password: ${{ secrets.LINUX_PASSWORD }}
         port: 22
         script: |
           echo "--------Truy cập vào thư mục dự án"
@@ -37,9 +37,11 @@ jobs:
           echo "--------Tạo .env và chỉnh sửa"
           cp .env.example .env
           sed -i 's/DB_USER/${{ secrets.DB_USER }}/g' .env
-          sed -i 's/DB_PW/${{ secrets.DB_PW }}/g' .env
-          sed -i 's/DB_HOST/${{ secrets.LINUX_UBUNTU_SERVER_IP }}/g' .env
+          sed -i 's/DB_PASSWORD/${{ secrets.DB_PASSWORD }}/g' .env
+          sed -i 's/DB_HOST/${{ secrets.LINUX_HOST }}/g' .env
+          sed -i 's/DB_PORT/${{ secrets.DB_PORT }}/g' .env
           sed -i 's/DB_NAME/${{ secrets.DB_NAME }}/g' .env
+
           sed -i 's/API_HOST/${{ secrets.API_HOST }}/g' .env
           sed -i 's/MAILER_ACC/${{ secrets.MAILER_ACC }}/g' .env
           sed -i 's/MAILER_PASS/${{ secrets.MAILER_PASS }}/g' .env
@@ -60,4 +62,4 @@ jobs:
           sudo swapoff -a; sudo swapon -a
 
           echo "--------Gửi thông báo!"
-          echo "curl -X POST -H "Content-Type: application/json" -H "Authorization:${{ secrets.DISCORD_AUTHORIZATION }}" -d '{"content":"Dự án node js đã deploy thành công link: https://api.khangdev.io.vn/ "}' ${{ secrets.DISCORD_NOTIFY_URL }}"
+          echo "curl -X POST -H "Content-Type: application/json" -H "Authorization:${{ secrets.DISCORD_TOKEN }}" -d '{"content":"Dự án node js đã deploy thành công link: https://api.khangdev.io.vn/ "}' ${{ secrets.DISCORD_URL }}"
