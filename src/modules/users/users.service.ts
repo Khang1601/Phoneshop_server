@@ -321,46 +321,83 @@ export class UsersService {
     }
 
     //----
-    async updatePhoneUser(phoneInfor: { userId: number, old: string, new: string }) {
-        try {
-            const data = await this.prisma.users.findFirst({
-                where: {
-                    id: phoneInfor.userId
-                }
-            })
-            if (compareSync(phoneInfor.old, data.phone)) {
-                await this.prisma.users.update({
-                    where: {
-                        id: phoneInfor.userId
-                    },
-                    data: {
-                        phone: phoneInfor.new
-                    }
-                })
+    // async updatePhoneUser(phoneInfor: { userId: number, old: string, new: string }) {
+    //     try {
+    //         const data = await this.prisma.users.findFirst({
+    //             where: {
+    //                 id: phoneInfor.userId
+    //             }
+    //         })
+    //         if (compareSync(phoneInfor.old, data.phone)) {
+    //             await this.prisma.users.update({
+    //                 where: {
+    //                     id: phoneInfor.userId
+    //                 },
+    //                 data: {
+    //                     phone: phoneInfor.new
+    //                 }
+    //             })
 
-                //---
-                console.log("phoneInfor.old", phoneInfor.old);
-                console.log("phoneInfor.new", phoneInfor.new);
-                console.log("Thay đổi SĐT thành công");
+    //             //---
+    //             console.log("phoneInfor.old", phoneInfor.old);
+    //             console.log("phoneInfor.new", phoneInfor.new);
+    //             console.log("Thay đổi SĐT thành công");
 
-                return {
-                    message: "Thay đổi SĐT thành công",
-                    result: true,
-                    data
-                }
-            } else {
-                //---
-                console.log("SĐT không đúng, nếu bạn là tài khoản đăng ký bằng Google mời quý khách liên hệ hỗ trợ để thiết lập lại SĐT");
+    //             return {
+    //                 message: "Thay đổi SĐT thành công",
+    //                 result: true,
+    //                 data
+    //             }
+    //         } else {
+    //             //---
+    //             console.log("SĐT không đúng, nếu bạn là tài khoản đăng ký bằng Google mời quý khách liên hệ hỗ trợ để thiết lập lại SĐT");
 
-                return {
-                    message: "SĐT không đúng, nếu bạn là tài khoản đăng ký bằng Google mời quý khách liên hệ hỗ trợ để thiết lập lại SĐT",
-                    result: false
-                }
-            }
-        } catch (error) {
-            return { error }
-        }
-    }
+    //             return {
+    //                 message: "SĐT không đúng, nếu bạn là tài khoản đăng ký bằng Google mời quý khách liên hệ hỗ trợ để thiết lập lại SĐT",
+    //                 result: false
+    //             }
+    //         }
+    //     } catch (error) {
+    //         return { error }
+    //     }
+    // }
+
+    // Tiếp tục trong class UsersService
+
+// async updatePhoneUser(userId: number, newPhone: string) {
+//     try {
+//         const updatedUser = await this.prisma.users.update({
+//             where: {
+//                 id: userId
+//             },
+//             data: {
+//                 phone: newPhone
+//             }
+//         });
+//         return {
+//             message: "Cập nhật số điện thoại thành công",
+//             data: updatedUser
+//         };
+//     } catch (error) {
+//         return {
+//             message: "Cập nhật số điện thoại thất bại",
+//             error: error
+//         };
+//     }
+// }
+
+// async updatePhone(userId: number, newPhone: string) {
+//     try {
+//       const updatedUser = await this.prisma.users.update({
+//         where: { id: userId },
+//         data: { phone: newPhone },
+//       });
+//       return { message: 'Phone number updated successfully', data: updatedUser };
+//     } catch (error) {
+//       return { message: 'Failed to update phone number', error };
+//     }
+//   }
+
 
     async topUp(info: { email: string, amount: number }) {
         try {

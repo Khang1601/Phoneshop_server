@@ -25,6 +25,7 @@ export class UsersController {
         avatar: fileName
       }
       let { message, data, error } = await this.usersService.uploadAvatar(updateData)
+      
       if (error) {
         throw error
       } else {
@@ -229,7 +230,6 @@ export class UsersController {
         // console.log("body1", body);
         // console.log("result1", result);
 
-
         return res.status(200).json({
           message,
           data
@@ -255,37 +255,72 @@ export class UsersController {
     }
   }
 
+
+
+
+
+
+
+
+
   //----
-  @Patch('update-phone-user')
-  async updatePhoneUser(@Body() body: { userId: number, old: string, new: string }, @Res() res: Response) {
-    try {
-      const { message, result, data, error } = await this.usersService.updatePhoneUser(body)
-      if (result) {
+  // @Patch('update-phone-user')
+  // async updatePhoneUser(@Body() body: { userId: number, old: string, new: string }, @Res() res: Response) {
+  //   try {
+  //     const { message, result, data, error } = await this.usersService.updatePhoneUser(body)
+  //     if (result) {
 
-        //---
-        console.log("body1", body);
-        console.log("result1", result);
+  //       //---
+  //       console.log("body1", body);
+  //       console.log("result1", result);
 
-        return res.status(200).json({
-          message,
-          data
-        })
-      } else {
+  //       return res.status(200).json({
+  //         message,
+  //         data
+  //       })
+  //     } else {
 
-        //---
-        console.log("body2", body);
-        console.log("result2", result);
+  //       //---
+  //       console.log("body2", body);
+  //       console.log("result2", result);
 
-        return res.status(214).json({
-          message
-        })
-      }
-    } catch (error) {
-      return res.status(413).json({
-        error
-      })
-    }
-  }
+  //       return res.status(214).json({
+  //         message
+  //       })
+  //     }
+  //   } catch (error) {
+  //     return res.status(413).json({
+  //       error
+  //     })
+  //   }
+  // }
+
+  // @Patch('update-phone/:userId')
+  // async updatePhoneUser(@Param('userId') userId: number, @Body() updatePhoneData: { phone: string }, @Res() res: Response) {
+  //   try {
+  //     const { message, data, error } = await this.usersService.updatePhoneUser(userId, updatePhoneData.phone);
+  //     if (error) {
+  //       throw error;
+  //     } else {
+  //       return res.status(200).json({ message, data });
+  //     }
+  //   } catch (error) {
+  //     console.log('Error:', error);
+  //     return res.status(500).json({ message: 'Failed to update phone number', error });
+  //   }
+  // }
+
+  // @Patch('update-phone/:userId')
+  // // async updatePhoneUser(@Param('userId') userId: string, @Body('phone') newPhone: string, @Res() res: Response) {
+  // async updatePhoneUser( userId: string, @Body() newPhone: string, @Res() res: Response) {
+  //   try {
+  //     const result = await this.usersService.updatePhone(Number(userId), newPhone);
+  //     return res.status(200).json(result);
+
+  //   } catch (error) {
+  //     return res.status(500).json({ message: 'Failed to update phone number', error });
+  //   }
+  // }
 
   @Post('top-up')
   async topUp(@Body() body: any) {
